@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.jbhu.BusinessListFragment
 import com.jbhuiyan.projects.vortoyelptest.R
 import com.jbhuiyan.projects.vortoyelptest.util.UpdateLocation
@@ -33,7 +34,6 @@ class MainActivity : AppCompatActivity(), UpdateLocation {
     private var hasNetwork = false
     private var locationGps: Location? = null
     private var locationNetwork: Location? = null
-    lateinit var accurateLocation: Location
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,53 +54,58 @@ class MainActivity : AppCompatActivity(), UpdateLocation {
         replaceFragment(BusinessListFragment(), false)
     }
 
-    @SuppressLint("MissingPermission")
-    override fun getLastUpdatedLocation(): Location {
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        if (hasGps || hasNetwork) {
+    override fun getLastUpdatedLocation(): Location? {
+        var accurateLocation: Location? = null
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+            if (hasGps || hasNetwork) {
 
-            if (hasGps) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    5000,
-                    100F,
-                    locationListener(true)
-                )
+                if (hasGps) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        5000,
+                        100F,
+                        locationListener(true)
+                    )
 
-                val localGpsLocation =
-                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                if (localGpsLocation != null)
-                    locationGps = localGpsLocation
-            }
-            if (hasNetwork) {
-
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    5000,
-                    100F,
-                    locationListener(false)
-                )
-
-                val localNetworkLocation =
-                    locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                if (localNetworkLocation != null)
-                    locationNetwork = localNetworkLocation
-            }
-
-            if (locationGps != null && locationNetwork != null) {
-                if (locationGps!!.accuracy > locationNetwork!!.accuracy) {
-                    accurateLocation = locationNetwork!!
-                } else {
-                    accurateLocation = locationGps!!
+                    val localGpsLocation =
+                        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                    if (localGpsLocation != null)
+                        locationGps = localGpsLocation
                 }
+                if (hasNetwork) {
+
+                    locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER,
+                        5000,
+                        100F,
+                        locationListener(false)
+                    )
+
+                    val localNetworkLocation =
+                        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                    if (localNetworkLocation != null)
+                        locationNetwork = localNetworkLocation
+                }
+
+                if (locationGps != null && locationNetwork != null) {
+                    if (locationGps!!.accuracy > locationNetwork!!.accuracy) {
+                        accurateLocation = locationNetwork!!
+                    } else {
+                        accurateLocation = locationGps!!
+                    }
+                }
+
+            } else {
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
             }
-
-        } else {
-            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
         }
-
         return accurateLocation
     }
 

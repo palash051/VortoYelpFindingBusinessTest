@@ -15,7 +15,7 @@ interface ListItemClickListener {
 
 interface UpdateLocation {
     fun updateLocationOnChanged(location: Location, isGPS: Boolean)
-    fun getLastUpdatedLocation(): Location
+    fun getLastUpdatedLocation(): Location?
 }
 
 

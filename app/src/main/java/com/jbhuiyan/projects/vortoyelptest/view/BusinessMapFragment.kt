@@ -35,7 +35,7 @@ class BusinessMapFragment(val business: Business) : Fragment(R.layout.fragment_b
     fun displayBusinessInMap() {
         //Place current location marker
         val currentLocation = (activity as UpdateLocation).getLastUpdatedLocation()
-        val (latLng, markerOptions) = setCurrentLocationMarker(currentLocation)
+        val (latLng, markerOptions) = setCurrentLocationMarker(currentLocation!!)
         googleMap.addMarker(markerOptions)
         //Place business location marker
         val businessMarkerOptions = setBusinessMarker()
