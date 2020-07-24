@@ -15,17 +15,15 @@ import com.jbhuiyan.projects.vortoyelptest.R
 import com.jbhuiyan.projects.vortoyelptest.businesslogic.Business
 import com.jbhuiyan.projects.vortoyelptest.businesslogic.getBusinessString
 import com.jbhuiyan.projects.vortoyelptest.util.CustomInfoWindowAdapter
-import com.jbhuiyan.projects.vortoyelptest.util.LocationChangedListener
-import com.jbhuiyan.projects.vortoyelptest.util.getCurrentLocation
+import com.jbhuiyan.projects.vortoyelptest.util.UpdateLocation
 
-
-class BusinessMapFragment(val business:Business) : Fragment(R.layout.fragment_business_map) ,
-    LocationChangedListener {
+class BusinessMapFragment(val business: Business) : Fragment(R.layout.fragment_business_map) {
     private lateinit var googleMap: GoogleMap
 
     private val callback = OnMapReadyCallback { googleMap ->
-        this.googleMap=googleMap
-        this.googleMap.uiSettings.isZoomControlsEnabled=true
+        this.googleMap = googleMap
+        this.googleMap.uiSettings.isZoomControlsEnabled = true
+        displayBusinessInMap()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,19 +32,15 @@ class BusinessMapFragment(val business:Business) : Fragment(R.layout.fragment_bu
         mapFragment?.getMapAsync(callback)
     }
 
-    override fun onResume() {
-        super.onResume()
-        getCurrentLocation()
-    }
-
-    override fun onChanged(location: Location) {
+    fun displayBusinessInMap() {
         //Place current location marker
-        val (latLng, markerOptions) = setCurrentLocationMarker(location)
+        val currentLocation = (activity as UpdateLocation).getLastUpdatedLocation()
+        val (latLng, markerOptions) = setCurrentLocationMarker(currentLocation)
         googleMap.addMarker(markerOptions)
         //Place business location marker
         val businessMarkerOptions = setBusinessMarker()
         googleMap.addMarker(businessMarkerOptions)
-        googleMap.setInfoWindowAdapter( CustomInfoWindowAdapter(context!!));
+        googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(context!!));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
     }
 

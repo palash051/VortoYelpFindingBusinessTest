@@ -11,12 +11,11 @@ import org.jetbrains.anko.layoutInflater
 
 class CustomInfoWindowAdapter(context: Context) : GoogleMap.InfoWindowAdapter {
 
-    private val window: View = context.layoutInflater.inflate(R.layout.custom_info_window, null)
     private val contents: View = context.layoutInflater.inflate(R.layout.custom_info_window, null)
 
     override fun getInfoWindow(marker: Marker): View? {
-        //render(marker, window)
-        return null
+        render(marker, contents)
+        return contents
     }
 
     override fun getInfoContents(marker: Marker): View? {
@@ -29,15 +28,15 @@ class CustomInfoWindowAdapter(context: Context) : GoogleMap.InfoWindowAdapter {
         titleUi.text = marker.title
         val snippet = view.findViewById<TextView>(R.id.snippet)
         val ratingbar = view.findViewById<RatingBar>(R.id.rating)
-        if(marker.snippet!=null) {
+        if (marker.snippet != null) {
             val split = marker.snippet.split("|")
             snippet.text = split[0]
             ratingbar.rating = split[1].toFloat()
-            snippet.visibility=View.VISIBLE
-            ratingbar.visibility=View.VISIBLE
-        }else{
-            snippet.visibility=View.GONE
-            ratingbar.visibility=View.GONE
+            snippet.visibility = View.VISIBLE
+            ratingbar.visibility = View.VISIBLE
+        } else {
+            snippet.visibility = View.GONE
+            ratingbar.visibility = View.GONE
         }
     }
 }
