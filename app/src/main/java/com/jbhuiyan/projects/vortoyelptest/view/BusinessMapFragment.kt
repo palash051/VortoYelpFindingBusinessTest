@@ -47,7 +47,7 @@ class BusinessMapFragment(val business:Business) : Fragment(R.layout.fragment_bu
         val businessMarkerOptions = setBusinessMarker()
         googleMap.addMarker(businessMarkerOptions)
         googleMap.setInfoWindowAdapter( CustomInfoWindowAdapter(context!!));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
     }
 
     private fun setBusinessMarker(): MarkerOptions {

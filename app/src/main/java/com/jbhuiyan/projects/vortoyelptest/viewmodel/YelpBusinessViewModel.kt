@@ -18,7 +18,7 @@ import javax.inject.Inject
 class YelpBusinessViewModel : ViewModel() {
 
     @Inject
-    lateinit var photosService: YelpBusinessService
+    lateinit var businessService: YelpBusinessService
     private val disposable = CompositeDisposable()
     val yelpModel = MutableLiveData<YelpModel>()
     val yelpLoadError = MutableLiveData<Boolean>()
@@ -31,7 +31,10 @@ class YelpBusinessViewModel : ViewModel() {
     }
 
     companion object {
-        const val STATIC_RADIUS: Int = 2000;
+        /* Considering 5 miles radius.
+        * If needed we can use a input UI component like edittext, dropdown
+        * */
+        const val RADIUS_IN_METERS: Int = 8050;
     }
 
     fun refresh() {
@@ -43,11 +46,11 @@ class YelpBusinessViewModel : ViewModel() {
         doAsync {
             uiThread {
                 disposable.add(
-                    photosService.getBusinesses(
+                    businessService.getBusinesses(
                         searchText,
                         location.value!!.latitude,
                         location.value!!.longitude,
-                        STATIC_RADIUS
+                        RADIUS_IN_METERS
                     ).subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(object : DisposableSingleObserver<YelpModel>() {

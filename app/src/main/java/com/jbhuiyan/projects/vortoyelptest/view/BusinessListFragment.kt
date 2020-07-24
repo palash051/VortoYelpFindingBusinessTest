@@ -49,11 +49,19 @@ class BusinessListFragment : Fragment(R.layout.fragment_business_list), Location
         super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
         inflater.inflate(R.menu.main_menu, menu)
+        setupSearchMenu(menu)
+    }
+
+    private fun setupSearchMenu(menu: Menu) {
         val item: MenuItem = menu.findItem(R.id.action_search)
         val searchView = SearchView((context as MainActivity).supportActionBar!!.themedContext)
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
         item.setActionView(searchView)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView.setOnQueryTextListener(onQueryTextListener())
+    }
+
+    private fun onQueryTextListener(): SearchView.OnQueryTextListener {
+        return object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query!!.length > 0) {
                     viewModel.searchText = query
@@ -66,12 +74,11 @@ class BusinessListFragment : Fragment(R.layout.fragment_business_list), Location
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }
-        })
+        }
     }
 
     private fun instantiateTheViewModel() {
         viewModel = ViewModelProviders.of(this).get(YelpBusinessViewModel::class.java)
-        //viewModel.refresh()
         featureList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = countriesAdapter
